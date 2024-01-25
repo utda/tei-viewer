@@ -6,18 +6,38 @@ import { useEffect, useState, Suspense } from "react";
 function CeteiceanContent() {
   const searchParams = useSearchParams();
 
-  const [manifest, setManifest] = useState(
-    "https://www.dl.ndl.go.jp/api/iiif/3437686/manifest.json"
-  );
-
+  const [manifest, setManifest] = useState("");
   const [isVertical, setIsVertical] = useState(false);
-
-  const [title, setTile] = useState("TEI Viewer");
+  const [title, setTitle] = useState("TEI Viewer");
 
   useEffect(() => {
-    const teiFileUrl =
-      searchParams.get("u") ||
-      "https://kouigenjimonogatari.github.io/tei/01.xml";
+    const teiFileUrl = searchParams.get("u") || "";
+
+    function updateHeight() {
+      const navHeight = document.querySelector("nav")?.offsetHeight || 0;
+      const main = document.getElementById("main");
+      if (main) {
+        main.style.height = `calc(100vh - ${navHeight}px)`;
+        main.style.overflow = "auto";
+      }
+    }
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+
+    // 横スクロールイベントリスナーの追加
+    const addWheelEventListener = () => {
+      const teiElement = document.getElementById("TEI");
+      if (!teiElement) return;
+      const onWheel = (event: WheelEvent) => {
+        var scrollAmount = -30;
+        if (event.deltaY > 0) teiElement.scrollLeft += scrollAmount;
+        else teiElement.scrollLeft -= scrollAmount;
+        event.preventDefault();
+      };
+
+      teiElement.addEventListener("wheel", onWheel, { passive: false });
+      return () => teiElement.removeEventListener("wheel", onWheel);
+    };
 
     setIsVertical(searchParams.get("v") === "true");
 
@@ -39,7 +59,7 @@ function CeteiceanContent() {
 
           const title = data.querySelector("tei-title");
           if (title) {
-            setTile(title.textContent || "");
+            setTitle(title.textContent || "");
           }
 
           teiElement.appendChild(data);
@@ -47,33 +67,12 @@ function CeteiceanContent() {
       });
     });
 
-    if (isVertical) {
-      document.getElementById("TEI")?.addEventListener(
-        "wheel",
-        function (event) {
-          // 横スクロールの量を設定
-          var scrollAmount = -30;
-
-          // マウスホイールの移動方向に基づいて横スクロール
-          if (event.deltaY > 0) this.scrollLeft += scrollAmount;
-          else this.scrollLeft -= scrollAmount;
-
-          // デフォルトのスクロール動作を防止
-          event.preventDefault();
-        },
-        { passive: false }
-      );
+    if (isVertical && !/Mobi/i.test(navigator.userAgent)) {
+      addWheelEventListener();
     }
 
-    window.onload = () => {
-      const navHeight = document.querySelector("nav")?.offsetHeight;
-      const main = document.getElementById("main");
-      if (main) {
-        main.style.height = `calc(100vh - ${navHeight}px)`;
-        main.style.overflow = "auto"; // コンテンツが多すぎる場合はスクロール可能に
-      }
-    };
-  }, []);
+    return () => window.removeEventListener("resize", updateHeight);
+  });
 
   return (
     <>
@@ -85,11 +84,7 @@ function CeteiceanContent() {
         </div>
       </nav>
 
-      <div
-        className="grid md:grid-cols-2 gap-4 grid-cols-1"
-        style={{ height: "100%" }}
-        id="main"
-      >
+      <div className="grid md:grid-cols-2 gap-4" id="main">
         <div
           style={{
             height: "100%",
@@ -100,12 +95,14 @@ function CeteiceanContent() {
           id="TEI"
           className="p-4"
         ></div>
+
         <iframe
           width="100%"
           height="100%"
           src={`/tei-viewer/mirador/index.html?manifest=${manifest}`}
           title="Mirador Viewer"
           style={{ border: "none" }}
+          className="hidden md:block"
         ></iframe>
       </div>
     </>
