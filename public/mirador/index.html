@@ -36,10 +36,10 @@
       const windows = [];
       if (vars.manifest) {
         const manifests = vars.manifest.split(";");
-        manifests.forEach(manifest => {
+        manifests.forEach((manifest) => {
           const obj = {
             manifestId: decodeURIComponent(manifest),
-            thumbnailNavigationPosition: "far-right"
+            thumbnailNavigationPosition: "far-right",
           };
           if (vars.canvas) {
             obj.canvasId = vars.canvas;
@@ -48,7 +48,7 @@
         });
       }
 
-      var windowSettings = {}
+      var windowSettings = {};
 
       var miradorInstance = Mirador.viewer({
         id: "mirador",

@@ -12,6 +12,8 @@ function CeteiceanContent() {
 
   const [isVertical, setIsVertical] = useState(false);
 
+  const [title, setTile] = useState("TEI Viewer");
+
   useEffect(() => {
     const teiFileUrl =
       searchParams.get("u") ||
@@ -35,6 +37,11 @@ function CeteiceanContent() {
           const facsimileElements = data.querySelectorAll("tei-facsimile");
           facsimileElements.forEach((el: { remove: () => any }) => el.remove());
 
+          const title = data.querySelector("tei-title");
+          if (title) {
+            setTile(title.textContent || "");
+          }
+
           teiElement.appendChild(data);
         }
       });
@@ -57,27 +64,50 @@ function CeteiceanContent() {
         { passive: false }
       );
     }
-  }, [searchParams, isVertical]);
+
+    window.onload = () => {
+      const navHeight = document.querySelector("nav")?.offsetHeight;
+      const main = document.getElementById("main");
+      if (main) {
+        main.style.height = `calc(100vh - ${navHeight}px)`;
+        main.style.overflow = "auto"; // コンテンツが多すぎる場合はスクロール可能に
+      }
+    };
+  }, []);
 
   return (
     <>
+      <nav className="bg-gray-900">
+        <div className="flex flex-wrap items-center justify-between mx-auto p-4">
+          <span className="self-center text-2xl font-semibold whitespace-nowrap text-white">
+            {title}
+          </span>
+        </div>
+      </nav>
+
       <div
-        style={{
-          height: "100%",
-          width: "100%",
-          overflow: "auto",
-          writingMode: isVertical ? "vertical-rl" : "horizontal-tb",
-        }}
-        id="TEI"
-        className="p-4"
-      ></div>
-      <iframe
-        width="100%"
-        height="100%"
-        src={`/tei-viewer/mirador/index.html?manifest=${manifest}`}
-        title="Mirador Viewer"
-        style={{ border: "none" }}
-      ></iframe>
+        className="grid md:grid-cols-2 gap-4 grid-cols-1"
+        style={{ height: "100%" }}
+        id="main"
+      >
+        <div
+          style={{
+            height: "100%",
+            width: "100%",
+            overflow: "auto",
+            writingMode: isVertical ? "vertical-rl" : "horizontal-tb",
+          }}
+          id="TEI"
+          className="p-4"
+        ></div>
+        <iframe
+          width="100%"
+          height="100%"
+          src={`/tei-viewer/mirador/index.html?manifest=${manifest}`}
+          title="Mirador Viewer"
+          style={{ border: "none" }}
+        ></iframe>
+      </div>
     </>
   );
 }
@@ -85,9 +115,7 @@ function CeteiceanContent() {
 export default function Ceteicean() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <div className="grid grid-cols-2 gap-4" style={{ height: "100vh" }}>
-        <CeteiceanContent />
-      </div>
+      <CeteiceanContent />
     </Suspense>
   );
 }
