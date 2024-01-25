@@ -1808,6 +1808,7 @@ tei-zone {
 }
 
 /* styles for html shell and html elements in TEI (e.g.,<a> and <img>) */
+/*
 html > body {
   margin: 0;
   padding: 0;
@@ -1823,3 +1824,4 @@ html {
   background-color: white;
   color: #292929;
 }
+*/
