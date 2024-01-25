@@ -4,10 +4,13 @@ import "./CETEIcean.css";
 
 const siteName = "TEI Viewer";
 const description = "TEI/XML Simple Viewer";
-const url = "https://nakamura196.github.io/tei-viewer/";
+const origin = "https://nakamura196.github.io";
+
+const prefixPath = process.env.prefixPath;
+const url = `${origin}${prefixPath}/`;
 
 export const metadata: Metadata = {
-  metadataBase: new URL(url),
+  metadataBase: new URL(origin),
   title: siteName,
   description,
   openGraph: {

@@ -7,6 +7,15 @@
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
     <title>Mirador</title>
+    <style>
+      /* Miradorの閉じるボタンを非表示にする */
+      .mirador-window-close { 
+        display: none !important;
+      }
+      .mirador-window-maximize {
+        display: none !important;
+      }
+    </style>
   </head>
   <body>
     <div
@@ -39,7 +48,7 @@
         manifests.forEach((manifest) => {
           const obj = {
             manifestId: decodeURIComponent(manifest),
-            thumbnailNavigationPosition: "far-right",
+            // thumbnailNavigationPosition: "far-right",
           };
           if (vars.canvas) {
             obj.canvasId = vars.canvas;
