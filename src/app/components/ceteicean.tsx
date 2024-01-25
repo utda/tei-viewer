@@ -6,7 +6,7 @@ import { useEffect, useState, Suspense } from "react";
 function CeteiceanContent() {
   const searchParams = useSearchParams();
 
-  const [u, setU] = useState("");
+  const [teiFileUrl, setTeiFileUrl] = useState("");
   const [manifest, setManifest] = useState("");
   const [isVertical, setIsVertical] = useState(false);
   const [title, setTitle] = useState("TEI Viewer");
@@ -26,7 +26,7 @@ function CeteiceanContent() {
 
   useEffect(() => {
     const teiFileUrl = searchParams.get("u") || "";
-    setU(teiFileUrl);
+    setTeiFileUrl(teiFileUrl);
 
     function updateHeight() {
       const navHeight = document.querySelector("nav")?.offsetHeight || 0;
@@ -149,7 +149,7 @@ function CeteiceanContent() {
               </li>
               <li className="flex items-center">
                 <a
-                  href={u}
+                  href={teiFileUrl}
                   title="Download XML"
                   target="_blank"
                   type="button"
