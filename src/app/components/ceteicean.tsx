@@ -96,14 +96,16 @@ function CeteiceanContent() {
           className="p-4"
         ></div>
 
-        <iframe
-          width="100%"
-          height="100%"
-          src={`/tei-viewer/mirador/index.html?manifest=${manifest}`}
-          title="Mirador Viewer"
-          style={{ border: "none" }}
-          className="hidden md:block"
-        ></iframe>
+        {manifest && (
+          <iframe
+            width="100%"
+            height="100%"
+            src={`/tei-viewer/mirador/index.html?manifest=${manifest}`}
+            title="Mirador Viewer"
+            style={{ border: "none" }}
+            className="hidden md:block"
+          ></iframe>
+        )}
       </div>
     </>
   );
