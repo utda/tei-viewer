@@ -7,6 +7,7 @@ const description = "TEI/XML Simple Viewer";
 const url = "https://nakamura196.github.io/tei-viewer/";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(url),
   title: siteName,
   description,
   openGraph: {
