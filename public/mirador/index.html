@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>Mirador</title>
+  </head>
+  <body>
+    <div
+      id="mirador"
+      style="position: absolute; top: 0; bottom: 0; left: 0; right: 0"
+    ></div>
+    <script>
+      document.write(
+        "<script type='text/javascript' src='https://unpkg.com/mirador@latest/dist/mirador.min.js'><\/script>"
+      );
+    </script>
+    <script type="text/javascript">
+      // URLパラメータを解析する関数
+      function getURLParameters() {
+        const params = new URLSearchParams(window.location.search);
+        const vars = {};
+        for (const [key, value] of params) {
+          vars[key] = decodeURI(value);
+        }
+        return vars;
+      }
+
+      // パラメータを取得
+      const vars = getURLParameters();
+
+      // Windowsオブジェクトの作成
+      const windows = [];
+      if (vars.manifest) {
+        const manifests = vars.manifest.split(";");
+        manifests.forEach(manifest => {
+          const obj = {
+            manifestId: decodeURIComponent(manifest),
+            thumbnailNavigationPosition: "far-right"
+          };
+          if (vars.canvas) {
+            obj.canvasId = vars.canvas;
+          }
+          windows.push(obj);
+        });
+      }
+
+      var windowSettings = {}
+
+      var miradorInstance = Mirador.viewer({
+        id: "mirador",
+        language: "ja",
+        theme: {
+          transitions:
+            window.location.port === "4488" ? { create: () => "none" } : {},
+        },
+        window: windowSettings,
+        windows,
+        workspaceControlPanel: {
+          enabled: false,
+        },
+      });
+    </script>
+  </body>
+</html>
