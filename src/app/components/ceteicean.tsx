@@ -78,6 +78,7 @@ function CeteiceanContent() {
 
     import("CETEIcean").then((CETEI) => {
       var CETEIcean = new CETEI.default();
+
       CETEIcean.getHTML5(teiFileUrl, function (data: any) {
         const teiElement = document.getElementById("TEI");
         if (teiElement) {
@@ -86,6 +87,24 @@ function CeteiceanContent() {
           const manifest = extractManifest(data);
           if (manifest) {
             setManifest(manifest);
+          }
+
+          const pbs = data.querySelectorAll("tei-pb");
+          for (const pb of pbs) {
+            if (!pb.hasAttribute("n")) continue;
+
+            const br = document.createElement("br");
+            pb.parentNode.insertBefore(br, pb);
+
+            // n属性の値を取得
+            const pageNumber = pb.getAttribute("n");
+            // 表示用の段落を作成
+            const pbDisplay = document.createElement("span");
+            pbDisplay.classList.add("text-gray-400");
+            pbDisplay.classList.add("horizontal-in-vertical");
+            pbDisplay.textContent = `[${pageNumber}]`;
+            // 段落をtei-pb要素の直前に挿入
+            pb.parentNode.insertBefore(pbDisplay, pb);
           }
 
           // Remove tei-facsimile elements from data

@@ -9,7 +9,7 @@
     <title>Mirador</title>
     <style>
       /* Miradorの閉じるボタンを非表示にする */
-      .mirador-window-close { 
+      .mirador-window-close {
         display: none !important;
       }
       .mirador-window-maximize {
@@ -48,7 +48,7 @@
         manifests.forEach((manifest) => {
           const obj = {
             manifestId: decodeURIComponent(manifest),
-            // thumbnailNavigationPosition: "far-right",
+            thumbnailNavigationPosition: "far-right",
           };
           if (vars.canvas) {
             obj.canvasId = vars.canvas;
