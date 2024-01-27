@@ -1,21 +1,25 @@
 # TEI Viewer
 
-![Node.js CI](https://github.com/nakamura196/tei-viewer/actions/workflows/nextjs.yml/badge.svg)
+![Node.js CI](https://github.com/utda/tei-viewer/actions/workflows/nextjs.yml/badge.svg)
 
 TEI/XML Simple Viewer
+
+<img src="assets/image01.webp" width="100%" title="Preview">
+
+Based on [CETEICean](https://teic.github.io/CETEIcean/), the text of TEI/XML is displayed. The 'n' attribute of the `pb` tag is shown. Additionally, images are displayed using the [Mirador](https://projectmirador.org/) viewer based on the URL of the IIIF manifest file provided in the `facsimile` tag.
 
 ## 🌐 Website
 
 Visit the demo page to try it out.
 
-<https://nakamura196.github.io/tei-viewer/?u=https://kouigenjimonogatari.github.io/tei/01.xml&v=true>
+<https://utda.github.io/tei-viewer/?u=https://kouigenjimonogatari.github.io/tei/01.xml&v=true>
 
 ## 📖 Parameter
 
-| Field | Description | Requirement | 
-| ---- | ---- | ---- |
-| u | URL of TEI/XML File | required |
-| v | If set to true, displays in vertical writing. | optional |
+| Field | Description                                   | Requirement |
+| ----- | --------------------------------------------- | ----------- |
+| u     | URL of TEI/XML File                           | required    |
+| v     | If set to true, displays in vertical writing. | optional    |
 
 ## 📖 Getting Started
 

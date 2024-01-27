@@ -4,7 +4,7 @@ import "./CETEIcean.css";
 
 const siteName = "TEI Viewer";
 const description = "TEI/XML Simple Viewer";
-const origin = "https://nakamura196.github.io";
+const origin = "https://utda.github.io";
 
 const prefixPath = process.env.prefixPath;
 const url = `${origin}${prefixPath}/`;
