@@ -1,6 +1,6 @@
 # TEI Viewer
 
-![Node.js CI](https://github.com/utda/tei-viewer/actions/workflows/nextjs.yml/badge.svg)
+![Node.js CI](https://github.com/utda/tei-viewer/actions/workflows/nextjs.yml/badge.svg) [![DOI](https://zenodo.org/badge/747989375.svg)](https://zenodo.org/badge/latestdoi/747989375)
 
 TEI/XML Simple Viewer
 
@@ -47,3 +47,9 @@ To learn more about Next.js, take a look at the following resources:
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+
+## Cite as
+
+[![DOI](https://zenodo.org/badge/747989375.svg)](https://zenodo.org/badge/latestdoi/747989375)
+
+The above DOI corresponds to the latest versioned release as [published to Zenodo](https://zenodo.org/records/10574443), where you will find all earlier releases. To cite `tei-viewer` independent of version, use https://doi.org/10.5281/zenodo.10574443, which will always redirect to the latest release.
