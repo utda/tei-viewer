@@ -1,8 +1,23 @@
 # TEI Viewer
 
+![Node.js CI](https://github.com/nakamura196/tei-viewer/actions/workflows/nextjs.yml/badge.svg)
+
 TEI/XML Simple Viewer
 
-## Getting Started
+## 🌐 Website
+
+Visit the demo page to try it out.
+
+<https://nakamura196.github.io/tei-viewer/?u=https://kouigenjimonogatari.github.io/tei/01.xml&v=true>
+
+## 📖 Parameter
+
+| Field | Description | Requirement | 
+| ---- | ---- | ---- |
+| u | URL of TEI/XML File | required |
+| v | If set to true, displays in vertical writing. | optional |
+
+## 📖 Getting Started
 
 First, run the development server:
 
@@ -20,7 +35,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## Learn More
+## 📖 Learn More
 
 To learn more about Next.js, take a look at the following resources:
 
