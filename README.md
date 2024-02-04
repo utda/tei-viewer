@@ -6,7 +6,7 @@ TEI/XML Simple Viewer
 
 <img src="assets/image01.webp" width="100%" title="Preview">
 
-Based on [CETEICean](https://teic.github.io/CETEIcean/), the text of TEI/XML is displayed. The 'n' attribute of the `pb` tag is shown. Additionally, images are displayed using the [Mirador](https://projectmirador.org/) viewer based on the URL of the IIIF manifest file provided in the `facsimile` tag.
+Based on [CETEICean](https://teic.github.io/CETEIcean/), the text of TEI/XML is displayed. The `n` attribute of the `pb` tag is shown. Additionally, images are displayed using the [Mirador](https://projectmirador.org/) viewer based on the URL of the IIIF manifest file provided in the `facsimile` tag.
 
 ## 🌐 Website
 
