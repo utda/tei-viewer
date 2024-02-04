@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "release": "npm version patch && git push origin --tags && VERSION=$(cat package.json | grep '\"version\"' | head -1 | awk -F '\"' '{print $4}') && gh release create \"v$VERSION\" --title \"Version $VERSION\""
+    "release": "npm version patch && git push origin --tags && VERSION=$(node -pe \"require('./package.json').version\") && gh release create \"v$VERSION\" --title \"Version $VERSION\""
   },
   "dependencies": {
     "CETEIcean": "^1.9.2",
