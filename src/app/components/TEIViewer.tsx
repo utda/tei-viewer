@@ -1,4 +1,4 @@
-export default function MiradorViewer({
+export default function TEIViewer({
   isVertical,
   fontSize,
 }: Readonly<{
