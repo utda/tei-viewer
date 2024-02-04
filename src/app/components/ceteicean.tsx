@@ -143,6 +143,17 @@ function CeteiceanContent() {
           {manifest && <MiradorViewer manifest={manifest} />}
         </div>
       )}
+      {!teiFileUrl && (
+        <p className="p-4">
+          Usage{" "}
+          <a
+            href="https://github.com/utda/tei-viewer?tab=readme-ov-file"
+            className="text-blue-700"
+          >
+            https://github.com/utda/tei-viewer?tab=readme-ov-file
+          </a>
+        </p>
+      )}
     </>
   );
 }

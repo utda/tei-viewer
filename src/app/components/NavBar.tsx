@@ -10,9 +10,9 @@ export default function NavBar({
   decreaseFontSize: () => void;
 }>) {
   return (
-    <nav className="bg-gray-900">
+    <nav className="border-gray-200 bg-gray-50">
       <div className="flex flex-wrap items-center justify-between mx-auto p-2">
-        <span className="self-center text-xl font-semibold whitespace-nowrap text-white">
+        <span className="self-center text-xl font-semibold whitespace-nowrap">
           {title}
         </span>
         {teiFileUrl && (
@@ -75,7 +75,7 @@ export default function NavBar({
                   className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center"
                 >
                   <svg
-                    className="w-[20px] h-[20px] text-white" 
+                    className="w-[20px] h-[20px] text-white"
                     aria-hidden="true"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="currentColor"
