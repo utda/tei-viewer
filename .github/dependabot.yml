@@ -1,0 +1,29 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+    # サプライチェーン攻撃対策: 公開直後のバージョンは取らない。
+    # 過去事例 (chalk/debug worm 2025-09, eslint-config-prettier 2025-07,
+    # ua-parser-js 2021) は数時間〜数日で検出・yank されている。
+    # security update は cooldown を無視するので即時適用される。
+    cooldown:
+      default-days: 5
+      semver-major-days: 30
+      semver-minor-days: 7
+      semver-patch-days: 3
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 5
+      semver-major-days: 30
+      semver-minor-days: 7
+      semver-patch-days: 3
