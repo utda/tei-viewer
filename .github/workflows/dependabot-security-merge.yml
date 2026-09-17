@@ -1,0 +1,117 @@
+name: Dependabot security merge
+
+# Dependabot の更新のうち「脆弱性を減らすもの」だけを自動で取り込む。
+#
+# 取り込む条件 (すべて満たすとき):
+#   1. Dependabot が作った PR である
+#   2. メジャー更新ではない (破壊的変更を自動で入れない)
+#   3. 変更された package-lock.json で、npm audit の high/critical が減る
+#   4. この PR の他のチェック (CI など) がすべて成功している
+#
+# ふつうの更新 (脆弱性と無関係) は取り込まない。公開直後の悪意ある版を
+# 自動で入れないため。そちらは人が見てからマージする。
+#
+# 判定に dependabot/fetch-metadata の ghsa-id を使わないのは、GITHUB_TOKEN では
+# Dependabot alert を読めず、常に空になるため。npm audit は同じ GHSA データベースを
+# 見るので、更新前後の件数差で「セキュリティ修正か」を判定できる。
+#
+# この job は書き込み権限を持つので、PR 側のコードは一切実行しない
+# (checkout も npm install もしない。lockfile を API で読むだけ)。
+#
+# GITHUB_TOKEN でのマージは push のワークフローを起動しない。
+# そのため、デプロイ用のワークフローを DEPLOY_WORKFLOWS で明示的に起動する。
+
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+env:
+  # マージ後に起動するワークフロー (空白区切り。無ければ空)
+  DEPLOY_WORKFLOWS: "nextjs.yml"
+
+jobs:
+  merge:
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+        id: meta
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 脆弱性が減るか (npm audit の high/critical を更新前後で比べる)
+        id: audit
+        if: steps.meta.outputs.update-type != 'version-update:semver-major'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          count() { # $1=ref $2=dir
+            local d; d=$(mktemp -d)
+            for f in package.json package-lock.json; do
+              gh api -H 'Accept: application/vnd.github.raw' "repos/$REPO/contents/$2$f?ref=$1" > "$d/$f" || { echo -1; return; }
+            done
+            local v
+            v=$( (cd "$d" && npm audit --package-lock-only --json 2>/dev/null || true) \
+              | jq '[.vulnerabilities[]?.via[] | objects | select(.severity == "high" or .severity == "critical") | .source] | unique | length' 2>/dev/null || true)
+            rm -rf "$d"
+            echo "${v:--1}"
+          }
+          reduced=false
+          for lock in $(gh pr diff "$PR" -R "$REPO" --name-only | grep -E '(^|/)package-lock\.json$' || true); do
+            dir=$(dirname "$lock"); [ "$dir" = "." ] && dir="" || dir="$dir/"
+            before=$(count "$BASE_SHA" "$dir"); after=$(count "$HEAD_SHA" "$dir")
+            echo "${lock}: high+critical ${before} -> ${after}"
+            if [ "$before" -ge 0 ] && [ "$after" -ge 0 ] && [ "$after" -lt "$before" ]; then reduced=true; fi
+          done
+          echo "reduced=$reduced" >> "$GITHUB_OUTPUT"
+          [ "$reduced" = true ] || echo "::notice::脆弱性が減らない更新なので、自動では取り込みません"
+
+      - name: 他のチェックの完了を待つ
+        id: checks
+        if: steps.audit.outputs.reduced == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          SELF: ${{ github.workflow }}
+        run: |
+          set -uo pipefail
+          sleep 60
+          i=0
+          while [ $i -lt 100 ]; do
+            json=$(gh pr checks "$PR" -R "$REPO" --json name,bucket,workflow 2>/dev/null) || true  # 待ち中は終了コード 8
+            [ -n "$json" ] || json='[]'
+            others=$(echo "$json" | jq --arg s "$SELF" '[.[] | select(.workflow != $s)]')
+            total=$(echo "$others" | jq length)
+            pending=$(echo "$others" | jq '[.[] | select(.bucket == "pending")] | length')
+            bad=$(echo "$others" | jq '[.[] | select(.bucket == "fail" or .bucket == "cancel")] | length')
+            echo "checks: total=$total pending=$pending failed=$bad"
+            if [ "$bad" -gt 0 ]; then echo "::warning::失敗したチェックがあるので取り込みません"; exit 0; fi
+            if [ "$total" -gt 0 ] && [ "$pending" -eq 0 ]; then echo "ok=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+            sleep 30; i=$((i+1))
+          done
+          echo "::warning::チェックが無い、または時間内に終わらないので取り込みません"
+
+      - name: マージしてデプロイを起動
+        if: steps.checks.outputs.ok == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+        run: |
+          set -euo pipefail
+          gh pr merge --squash --delete-branch "$PR_URL"
+          for w in $DEPLOY_WORKFLOWS; do
+            echo "start $w"
+            gh workflow run "$w" -R "$REPO" --ref "$BASE"
+          done
