@@ -50,10 +50,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
+          # 比較の起点は PR の分岐元。pull_request.base.sha は PR 作成時の main を指すことがあり、
+          # rebase 後だと、その間に main へ入った別の修正までこの PR の手柄に数えてしまう。
+          BASE_SHA=$(gh api "repos/$REPO/compare/$BASE_REF...$HEAD_SHA" --jq .merge_base_commit.sha)
           count() { # $1=ref $2=dir
             local d; d=$(mktemp -d)
             for f in package.json package-lock.json; do
@@ -110,7 +113,15 @@ jobs:
           BASE: ${{ github.event.pull_request.base.ref }}
         run: |
           set -euo pipefail
-          gh pr merge --squash --delete-branch "$PR_URL"
+          # 同時に複数の PR が通ると、後の方は「main が変わった」で一時的に失敗する。
+          # 間を空けて数回やり直す。本当に衝突している場合は、Dependabot が自分で
+          # rebase し、この判定がもう一度走る。
+          n=0
+          until gh pr merge --squash --delete-branch "$PR_URL"; do
+            n=$((n+1))
+            if [ $n -ge 5 ]; then echo "::warning::マージできませんでした (衝突の可能性)"; exit 0; fi
+            sleep $((15 + RANDOM % 30))
+          done
           for w in $DEPLOY_WORKFLOWS; do
             echo "start $w"
             gh workflow run "$w" -R "$REPO" --ref "$BASE"
